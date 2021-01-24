@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: mikeventarola-net
+  namespace: default
+spec:
+  secretName: mikeventarola-net-tls
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: mikeventarola.net
+  dnsNames:
+  - mikeventarola.net
