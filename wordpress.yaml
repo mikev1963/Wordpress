@@ -1,27 +1,11 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: wordpress-persistent-storage
-  #namespace: wordpress
-  labels:
-    app: wordpress
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wordpress
-  #namespace: wordpress
   labels:
     app: wordpress
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: wordpress
@@ -35,7 +19,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - image: wordpress:5.6-apache
+        - image: wordpress:5.6.1-apache
           name: wordpress
           env:
             - name: WORDPRESS_DB_HOST
@@ -60,15 +44,14 @@ spec:
               memory: '256Mi'
       volumes:
         - name: wordpress-persistent-storage
-          nfs:
-            server: 192.168.1.40
-            path: /nfs/html
+          persistentVolumeClaim:
+            claimName: wordpress-nfs-pvc
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: wordpress
-  #namespace: wordpress
   labels:
     app: wordpress
 spec:
@@ -80,23 +63,17 @@ spec:
   type: NodePort
 
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: wordpress
   annotations:
     kubernetes.io/ingress.class: "traefik"
+    ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-  - host: mikeventarola.net
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: wordpress
-          servicePort: 80
-  - host: www.mikeventarola.net
+  - host: blog.mikeventarola.net
     http:
       paths:
       - path: /
@@ -104,7 +81,6 @@ spec:
           serviceName: wordpress
           servicePort: 80
   tls:
-  - secretName: mikeventarola-net-tls
-    hosts:
-    - mikeventarola.net
-    - www.mikeventarola.net
+  - hosts:
+    - blog.mikeventarola.net
+    secretName: blog-mikeventarola-net-tls

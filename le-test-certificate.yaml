@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
-  name: mikeventarola-net
+  name: blog.mikeventarola-net
   namespace: default
 spec:
-  secretName: mikeventarola-net-tls
+  secretName: blog.mikeventarola-net-tls
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
-  commonName: mikeventarola.net
+  commonName: blog.mikeventarola.net
   dnsNames:
-  - mikeventarola.net
+  - blog.mikeventarola.net

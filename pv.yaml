@@ -2,34 +2,34 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: wordpress-persistent-storage
-  labels:
-    app: wordpress
-    tier: frontend
+  name: wordpress-nfs-pv
 spec:
   capacity:
-    storage: 20Gi
+    storage: 1Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   nfs:
     server: 192.168.1.40
-    # Exported path of your NFS server
-    path: /nfs/html
+    path: /opt/nfs/wordpress
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: default
+    name: wordpress-nfs-pvc
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-persistent-storage
-  labels:
-    app: wordpress
-    tier: mysql
+  name: mariadb-nfs-pv
 spec:
   capacity:
-    storage: 20Gi
+    storage: 1Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   nfs:
     server: 192.168.1.40
-    # Exported path of your NFS server
-    path: /nfs/mysql
+    path: /opt/nfs/mariadb
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: default
+    name: mariadb-nfs-pvc
